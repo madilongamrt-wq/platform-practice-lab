@@ -19,6 +19,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { exercises } from './exercises';
+import InstallLab from './InstallLab';
 
 type User = { userId: string; name?: string; email?: string };
 type Progress = {
@@ -203,6 +204,7 @@ export default function App() {
   if (!user)
     return (
       <div className="login-page">
+        <InstallLab />
         <div className="login-brand">
           <span className="logo">
             <Terminal size={22} />
@@ -261,6 +263,7 @@ export default function App() {
 
   return (
     <div className="shell">
+      <InstallLab />
       <aside className="sidebar">
         <a
           className="brand"

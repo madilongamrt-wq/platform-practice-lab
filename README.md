@@ -4,6 +4,12 @@ A mobile-friendly practice app for experienced OpenShift engineers preparing for
 
 Live app: https://platform-practice-lab-mwcv1o.v2.appdeploy.ai/
 
+## Install on your phone
+
+Open the [live app](https://platform-practice-lab-mwcv1o.v2.appdeploy.ai/) in Chrome on Android or Safari on iPhone.
+Choose Install lab for device instructions. See [installation guide](docs/install.md).
+The app opens in its own window after home-screen installation. Sign-in and progress saving require internet.
+
 ## Features
 
 - Ten fictional incidents across Kubernetes/OpenShift, CI/CD, monitoring, Bash, and incident response.
@@ -32,7 +38,7 @@ Keep both exercise data files synchronized when editing the curriculum.
 This repository stores the exported source. The running app, authentication, and database remain hosted by AppDeploy.
 
 AppDeploy app ID: `platform-practice-lab-mwcv1o`
-Exported source version: `1792601673509`
+Current PWA source version: `1792606437525`
 
 The initial source was exported through AppDeploy's source API. Exporting source does not create a GitHub-to-AppDeploy deployment pipeline. Commits here do not automatically update the live app.
 

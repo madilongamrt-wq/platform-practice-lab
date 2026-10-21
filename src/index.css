@@ -1446,3 +1446,51 @@ details pre {
     display: none;
   }
 }
+
+/* Installable web app controls */
+.pwa-install-trigger {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 15;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 17px;
+  border-radius: 30px;
+  border: 1px solid #4c8d72;
+  background: #173f37;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 6px 24px #173f3725;
+}
+.pwa-dialog {
+  width: min(500px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 30px;
+  border: 1px solid #dce6d7;
+  border-radius: 18px;
+  background: #fff;
+  color: #223c3c;
+  overflow-y: auto;
+}
+.pwa-dialog::backdrop { background: #0e261d88; }
+.pwa-close { position: absolute; right: 13px; top: 13px; background: none; padding: 8px; color: #6c7c7a; }
+.pwa-app-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 13px; background: #eaf4ef; color: #226e55; margin-bottom: 20px; }
+.pwa-dialog h2 { font-size: 23px; line-height: 1.4; }
+.pwa-dialog > p { margin-top: 14px; font-size: 13px; }
+.pwa-native-install { width: 100%; margin-top: 20px; }
+.pwa-instruction { border-top: 1px solid #e3e9e3; padding-top: 16px; margin-top: 17px; }
+.pwa-instruction h3 { font-size: 13px; display: flex; gap: 7px; align-items: center; }
+.pwa-instruction p { font-size: 12px; margin-top: 7px; }
+.pwa-dialog .pwa-connection, .pwa-dialog .pwa-tip { font-size: 11px; }
+.pwa-message { padding: 12px; background: #eff7ef; border-radius: 7px; color: #356b4e; }
+@media (display-mode: standalone) {
+  .main { padding-bottom: env(safe-area-inset-bottom); }
+}
+@media (max-width: 760px) {
+  .pwa-dialog { padding: 25px; }
+  footer { padding-bottom: 85px; }
+}

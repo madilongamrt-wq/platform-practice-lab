@@ -33,14 +33,18 @@
       "POST /api/progress/:id reset",
       "reset cancellation",
       "mobile layout",
-      "reset persistence"
+      "reset persistence",
+      "installation guidance and dismiss",
+      "PWA install entry before sign-in"
     ],
     "description": "Verify assistance and reset preserve coherent mobile progress.",
     "steps": [
+      "Before signing in, select Install lab. Verify Android, iPhone, desktop, and internet connection instructions. Close with Done and verify the sign-in screen remains usable.",
       "Sign in and open Running is not ready. Reveal all three hints sequentially. Verify distinct hints and disabled further hint button.",
       "Show solution and verify explanation and example commands. Copy all displayed example commands into the command field and submit. Verify all objectives pass and score is capped at 40.",
       "Refresh and reopen. Verify hints, solution, and completion persist.",
-      "Choose Reset this exercise then Keep progress. Verify progress remains. Choose reset again and Confirm reset. Refresh and reopen."
+      "Choose Reset this exercise then Keep progress. Verify progress remains. Choose reset again and Confirm reset. Refresh and reopen.",
+      "Open Install lab while signed in, then close the instructions. Verify the exercise and progress remain visible."
     ],
     "expected": "Confirmed reset clears attempts, hints, solution reveal, score and completion. Mobile controls fit the viewport."
   },

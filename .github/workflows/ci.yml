@@ -33,12 +33,14 @@ jobs:
         run: node --check tools/test-backend.cjs
       - name: Run controlled backend regression checks
         run: node --disable-warning=ExperimentalWarning tools/test-backend.cjs
+      - name: Check installable app behavior
+        run: node --disable-warning=ExperimentalWarning tools/test-pwa.cjs
       - name: Describe verification scope
         if: always()
         run: |
           cat >> "$GITHUB_STEP_SUMMARY" <<'SUMMARY'
           ## Platform Practice Lab
           This job tests all ten solution examples and backend progress logic with mocked authentication and database storage.
-          It does not verify live sign-in, real persistence, or browser rendering.
+          It also checks PWA metadata, icon dimensions, install prompt behavior, and public-only offline caching. It does not verify live sign-in, real persistence, browser rendering, or installation on a physical phone.
           Container publishing and Argo CD delivery are pending the self-hosted runtime and target cluster setup.
           SUMMARY
