@@ -1,0 +1,44 @@
+name: Lab CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-regression:
+    name: Controlled backend regression
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Check backend regression script syntax
+        run: node --check tools/test-backend.cjs
+      - name: Run controlled backend regression checks
+        run: node --disable-warning=ExperimentalWarning tools/test-backend.cjs
+      - name: Describe verification scope
+        if: always()
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'SUMMARY'
+          ## Platform Practice Lab
+          This job tests all ten solution examples and backend progress logic with mocked authentication and database storage.
+          It does not verify live sign-in, real persistence, or browser rendering.
+          Container publishing and Argo CD delivery are pending the self-hosted runtime and target cluster setup.
+          SUMMARY

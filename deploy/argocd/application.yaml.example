@@ -1,0 +1,22 @@
+# TEMPLATE ONLY. Replace every REPLACE_* value before applying.
+# This app currently depends on AppDeploy SDK services.
+# Create and test standalone workload manifests before configuring source.path.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-practice-lab
+  namespace: REPLACE_ARGOCD_NAMESPACE
+spec:
+  project: REPLACE_ARGOCD_PROJECT
+  source:
+    repoURL: https://github.com/madilongamrt-wq/platform-practice-lab.git
+    targetRevision: main
+    path: REPLACE_WORKLOAD_MANIFEST_PATH
+  destination:
+    server: REPLACE_REGISTERED_CLUSTER_API_URL
+    namespace: REPLACE_WORKLOAD_NAMESPACE
+  syncPolicy:
+    automated:
+      enabled: false
+      prune: false
+      selfHeal: false

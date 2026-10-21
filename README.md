@@ -38,6 +38,14 @@ The initial source was exported through AppDeploy's source API. Exporting source
 
 To update the existing app, use the connected AppDeploy workflow with the app ID above, supply changed source files, and wait for deployment and QA checks. Avoid creating a second app unintentionally.
 
+## CI and GitOps setup
+
+GitHub Actions runs the controlled backend regression suite for pushes and pull requests to main.
+See [workflow runs](https://github.com/madilongamrt-wq/platform-practice-lab/actions).
+
+Argo CD setup remains pending: the app first needs a standalone runtime and a target cluster.
+See [delivery setup](docs/gitops-delivery.md) and the [Argo CD template](deploy/argocd/application.yaml.example).
+
 ## Local development limits
 
 AppDeploy injects `@appdeploy/client` and `@appdeploy/sdk` during its build/runtime. They are deliberately absent from package.json.
