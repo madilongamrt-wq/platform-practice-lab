@@ -2,7 +2,7 @@ name: Lab CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, migration/free-hosting]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -15,32 +15,50 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  backend-regression:
-    name: Controlled backend regression
+  application:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Check out source
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - name: Set up Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
           node-version: '24'
           package-manager-cache: false
-      - name: Check backend regression script syntax
-        run: node --check tools/test-backend.cjs
-      - name: Run controlled backend regression checks
-        run: node --disable-warning=ExperimentalWarning tools/test-backend.cjs
+      - name: Install dependencies
+        run: npm install --package-lock=false
+      - name: Check both grading implementations
+        run: |
+          node --disable-warning=ExperimentalWarning tools/test-backend.cjs
+          node --disable-warning=ExperimentalWarning tools/test-grading.cjs
       - name: Check installable app behavior
         run: node --disable-warning=ExperimentalWarning tools/test-pwa.cjs
-      - name: Describe verification scope
-        if: always()
+      - name: Type-check and build for GitHub Pages
+        env:
+          VITE_BASE_PATH: /platform-practice-lab/
         run: |
-          cat >> "$GITHUB_STEP_SUMMARY" <<'SUMMARY'
-          ## Platform Practice Lab
-          This job tests all ten solution examples and backend progress logic with mocked authentication and database storage.
-          It also checks PWA metadata, icon dimensions, install prompt behavior, and public-only offline caching. It does not verify live sign-in, real persistence, browser rendering, or installation on a physical phone.
-          Container publishing and Argo CD delivery are pending the self-hosted runtime and target cluster setup.
-          SUMMARY
+          npm run build
+          node tools/test-pages-build.cjs
+
+  database-isolation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: local-ci-only
+          POSTGRES_DB: lab_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Test real PostgreSQL row-level security and save RPC
+        env:
+          PGPASSWORD: local-ci-only
+        run: psql -h 127.0.0.1 -U postgres -d lab_test -v ON_ERROR_STOP=1 -f tools/test-rls.sql

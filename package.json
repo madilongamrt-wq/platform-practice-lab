@@ -1,17 +1,18 @@
 {
-  "name": "vite-react-app",
+  "name": "platform-practice-lab",
   "private": true,
   "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc --noEmit && vite build && node tools/prepare-pwa.cjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "lucide-react": "^0.469.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@supabase/supabase-js": "2.118.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.0.0"

@@ -29,10 +29,10 @@ export async function requestInstall() {
   return choice.outcome;
 }
 
-export function registerServiceWorker() {
+export function registerServiceWorker(base = '/') {
   if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
   const register = () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })
+    navigator.serviceWorker.register(base + 'sw.js', { scope: base, updateViaCache: 'none' })
       .catch(() => {
         // Installation metadata and manual home-screen instructions still work
         // when a browser disallows service workers.

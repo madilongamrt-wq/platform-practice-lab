@@ -1,92 +1,61 @@
 # Platform Practice Lab
 
-A mobile-friendly practice app for experienced OpenShift engineers preparing for SRE roles.
+Ten simulated platform engineering incidents with private progress, progressive hints, explained solutions, and a mobile home-screen experience.
 
-Live app: https://platform-practice-lab-mwcv1o.v2.appdeploy.ai/
+## Migration status
 
-## Install on your phone
+This branch prepares a move from AppDeploy to GitHub Pages and Supabase.
+The Supabase account/project, database migration, sign-in accounts, and GitHub Pages settings must be connected before activation.
+The existing app remains at https://platform-practice-lab-mwcv1o.v2.appdeploy.ai/ during preparation.
 
-Open the [live app](https://platform-practice-lab-mwcv1o.v2.appdeploy.ai/) in Chrome on Android or Safari on iPhone.
-Choose Install lab for device instructions. See [installation guide](docs/install.md).
-The app opens in its own window after home-screen installation. Sign-in and progress saving require internet.
-
-## Features
-
-- Ten fictional incidents across Kubernetes/OpenShift, CI/CD, monitoring, Bash, and incident response.
-- Evidence, command-entry challenges, three progressive hints, explained solutions, and objective checks.
-- Predefined command responses. Entered commands never execute.
-- Per-user saved answers, attempts, hints, scores, and completion.
-- Exercise reset, search, filters, and topic progress.
+Read [the complete setup and verification guide](docs/free-hosting.md).
 
 ## Architecture
 
-The React/Vite frontend calls protected backend routes using AppDeploy's client SDK.
-The TypeScript backend uses AppDeploy authentication middleware and persistent database services.
+- React and Vite frontend in src/.
+- Supabase email/password sign-in through src/client.ts.
+- Per-user PostgreSQL progress with RLS and a revision-checked save RPC.
+- Browser-based simulated grading in src/grading.ts. Commands never execute.
+- Ten exercise definitions in src/exercises.ts.
+- Installable PWA with public-only offline fallback.
+- GitHub Actions build, regression, database isolation, and gated Pages deployment.
 
-- `src/App.tsx`: interface, sign-in flow, and progress views.
-- `src/exercises.ts`: frontend curriculum.
-- `backend/index.ts`: authenticated progress API and scoring.
-- `backend/exercises.ts`: backend curriculum used for grading.
-- `tests/tests.json`: five declarative browser workflow specifications.
-- `tools/test-backend.cjs`: controlled backend regression checks.
-- `vite.config.ts`: frontend build configuration.
+The new frontend has no AppDeploy SDK dependency. backend/ preserves the original AppDeploy implementation for reference.
 
-Keep both exercise data files synchronized when editing the curriculum.
+## Develop
 
-## Hosting and GitHub
-
-This repository stores the exported source. The running app, authentication, and database remain hosted by AppDeploy.
-
-AppDeploy app ID: `platform-practice-lab-mwcv1o`
-Current PWA source version: `1792606437525`
-
-The initial source was exported through AppDeploy's source API. Exporting source does not create a GitHub-to-AppDeploy deployment pipeline. Commits here do not automatically update the live app.
-
-To update the existing app, use the connected AppDeploy workflow with the app ID above, supply changed source files, and wait for deployment and QA checks. Avoid creating a second app unintentionally.
-
-## CI and GitOps setup
-
-GitHub Actions runs the controlled backend regression suite for pushes and pull requests to main.
-See [workflow runs](https://github.com/madilongamrt-wq/platform-practice-lab/actions).
-
-Argo CD setup remains pending: the app first needs a standalone runtime and a target cluster.
-See [delivery setup](docs/gitops-delivery.md) and the [Argo CD template](deploy/argocd/application.yaml.example).
-
-## Local development limits
-
-AppDeploy injects `@appdeploy/client` and `@appdeploy/sdk` during its build/runtime. They are deliberately absent from package.json.
-
-A plain `npm install` followed by `npm run dev` or `npm run build` outside AppDeploy does not supply those SDKs or the managed backend services. This export is not a standalone self-hosting package.
-
-For development using the existing services, use AppDeploy's supported environment and SDK tooling. To host on OpenShift, Azure, or another provider, replace the SDK integrations with your own authentication, API transport, database adapter, and deployment configuration.
-
-## Repeatable backend checks
-
-Requirements: Node.js 24 or newer. No package installation or credentials are required for these controlled checks.
+Use Node.js 24 or newer.
 
 ```bash
-node --disable-warning=ExperimentalWarning tools/test-backend.cjs
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-The checks load the exported TypeScript with Node's type-stripping API and mock the SDK router, identity context, and database. They cover all ten worked solutions, kubectl alternatives, anonymous denial, user isolation, state readback, empty input, hints, solution scoring, revision conflicts, reset, and unsafe-command scoring.
+Set only the public Supabase HTTPS URL and sb_publishable_ key in .env.local.
+Accounts must be provisioned in Supabase. Never commit credentials or privileged keys.
 
-These checks do not verify an external sign-in provider, actual AppDeploy database durability, or browser rendering.
+## Verify
 
-## Validation at export
+```bash
+node --disable-warning=ExperimentalWarning tools/test-grading.cjs
+node --disable-warning=ExperimentalWarning tools/test-backend.cjs
+node --disable-warning=ExperimentalWarning tools/test-pwa.cjs
+VITE_BASE_PATH=/platform-practice-lab/ npm run build
+node tools/test-pages-build.cjs
+```
 
-- AppDeploy reported the deployment ready with no captured frontend, backend, or network errors.
-- Controlled backend regression checks passed.
-- The declarative browser tests are included, but AppDeploy returned no end-to-end QA run report.
-- Live sign-in, real database persistence, and account separation still require verification in a signed-in live session.
+The PostgreSQL isolation suite runs in CI against a fresh test database.
+Live sign-in and real account acceptance checks remain required after connecting Supabase.
 
-## Scoring
+## Privacy and scoring
 
-Objectives receive equal credit. Revealing a hint subtracts five points. Viewing the solution caps the score at 40.
-Completion means every objective matched, including assisted attempts.
-Scoring uses text patterns, not a full shell, YAML, or PromQL parser. Some valid alternative syntax will not match.
-The interface retains the most recent 30 attempt entries per exercise while keeping the total attempt count.
+The database restricts rows to the authenticated owner using auth.uid().
+The save RPC locks the owner's row, checks the expected revision, and handles replay of the latest request.
+The app keeps at most 30 recent attempt entries per exercise and trims older entries when needed to keep record size bounded.
+Scoring is self-practice feedback, not a tamper-proof certification system.
 
-## Data privacy
+## Cost
 
-Progress endpoints require AppDeploy authentication. The backend derives each record key from the authenticated user ID and exercise ID. Clients cannot choose another user's record key.
-No credentials, access tokens, database records, or real infrastructure details are included in this export.
+GitHub Pages and Supabase Free are the intended services. Free tiers have quotas and service limits.
+This migration does not provision paid resources or activate a new hosting subscription.

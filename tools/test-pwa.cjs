@@ -32,6 +32,7 @@ async function main() {
     URL, Response,
     self: {
       location: { origin: 'https://lab.test' },
+      registration: { scope: 'https://lab.test/' },
       clients: { claim: async () => {} },
       skipWaiting: () => {},
       addEventListener: (type, listener) => { handlers[type] = listener; }
