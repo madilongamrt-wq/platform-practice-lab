@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Solve an incident and retain private progress",
+    "sanity": true,
+    "viewport": "desktop",
+    "covers": [
+      "sign-in and sign-out",
+      "anonymous denial",
+      "GET /api/progress",
+      "POST /api/progress/:id submit",
+      "simulated commands",
+      "alternative kubectl syntax",
+      "scoring and history",
+      "completion persistence"
+    ],
+    "description": "Verify authenticated command practice saves durable private progress.",
+    "steps": [
+      "When signed out, verify sign-in screen hides progress. Sign in using an available AppDeploy test account and open The restart loop.",
+      "Submit echo hello and verify no supported pattern matched.",
+      "Submit these three commands together: kubectl logs ledger-api-7c9 --previous\\nkubectl set env deployment/ledger-api DB_HOST=db.copper-lab.svc\\nkubectl rollout status deployment/ledger-api",
+      "Verify all three objectives pass and score is 100. Refresh and reopen the exercise. Verify history, attempts and completed status persist. Sign out."
+    ],
+    "expected": "All objectives complete and saved results survive refresh. Sign-out hides private progress."
+  },
+  {
+    "name": "Progressive hints, solution and reset on mobile",
+    "viewport": "mobile",
+    "covers": [
+      "POST /api/progress/:id hint",
+      "three hints",
+      "POST /api/progress/:id solution",
+      "solution explanation and assisted scoring",
+      "POST /api/progress/:id reset",
+      "reset cancellation",
+      "mobile layout",
+      "reset persistence"
+    ],
+    "description": "Verify assistance and reset preserve coherent mobile progress.",
+    "steps": [
+      "Sign in and open Running is not ready. Reveal all three hints sequentially. Verify distinct hints and disabled further hint button.",
+      "Show solution and verify explanation and example commands. Copy all displayed example commands into the command field and submit. Verify all objectives pass and score is capped at 40.",
+      "Refresh and reopen. Verify hints, solution, and completion persist.",
+      "Choose Reset this exercise then Keep progress. Verify progress remains. Choose reset again and Confirm reset. Refresh and reopen."
+    ],
+    "expected": "Confirmed reset clears attempts, hints, solution reveal, score and completion. Mobile controls fit the viewport."
+  },
+  {
+    "name": "Full curriculum and topic progress",
+    "viewport": "desktop",
+    "covers": [
+      "10 scenarios and all exercise content",
+      "search and topic filtering",
+      "hide completed",
+      "remaining exercise scoring",
+      "weak topics and progress dashboard"
+    ],
+    "description": "Verify all curriculum examples score correctly and feed progress views.",
+    "steps": [
+      "Sign in. Verify 10 exercise cards with filters cleared. Search Storage and verify Storage at the limit. Clear search. Select Monitoring and verify two exercises. Return to All exercises.",
+      "For each of these exercises, open it, Show solution, copy all displayed example commands into the command field and submit: Permission denied, Storage at the limit, A green build, a broken release, GitOps keeps reverting the fix, The noisy pager, Averages hide the slow requests, A script that hides failures, Recover before investigating deeper.",
+      "Verify every example completes every objective. Verify each exercise includes scenario, symptoms, evidence, challenge, three hints available, explanation and completion check.",
+      "Return to library, enable Hide completed exercises and verify completed cards disappear. Disable the filter.",
+      "Open My progress. Verify completed count and attempts reflect results. Verify assisted topics show Needs practice. Open an exercise from the results list."
+    ],
+    "expected": "All ten exercises exist, all eight submitted solution examples pass, and search, filters, progress and weak topics reflect saved data."
+  },
+  {
+    "name": "User isolation across account switching",
+    "viewport": "desktop",
+    "covers": [
+      "per-user backend authorization",
+      "account switching",
+      "private answers and progress boundary"
+    ],
+    "description": "Verify two signed-in users never share answers or progress.",
+    "steps": [
+      "Actor A signs in and opens The restart loop. Submit echo actor-a-private-marker.",
+      "Actor A signs out and Actor B signs in with a different AppDeploy test account. Open The restart loop and verify A’s marker is absent and B has independent progress.",
+      "Actor B signs out. Actor A signs back in and reopens The restart loop."
+    ],
+    "expected": "Only Actor A sees actor-a-private-marker and A’s saved progress."
+  },
+  {
+    "name": "Validation and save error recovery",
+    "viewport": "mobile",
+    "covers": [
+      "empty command validation",
+      "POST progress error handling",
+      "failed mutation guardrail",
+      "retry saved progress"
+    ],
+    "description": "Verify invalid input and failed saves display actionable errors.",
+    "qa_faults": [
+      {
+        "method": "POST",
+        "path": "/api/progress/crashloop",
+        "status": 500,
+        "body_json": {
+          "error": "simulated_failure"
+        }
+      }
+    ],
+    "steps": [
+      "Sign in and open The restart loop. Note attempt count. Leave command empty and Submit commands. Verify enter-command validation and unchanged attempts.",
+      "Enter oc logs ledger-api-7c9 --previous and submit. Verify visible error says progress was not confirmed.",
+      "Use Retry loading saved progress. Verify saved attempt count remains unchanged."
+    ],
+    "expected": "Empty input is blocked, failed save is visible, and saved state reloads without falsely claiming success."
+  }
+]
