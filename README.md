@@ -5,7 +5,7 @@ Ten simulated platform engineering incidents with private progress, progressive 
 ## Migration status
 
 This branch prepares a move from AppDeploy to GitHub Pages and Supabase.
-The Supabase account/project, database migration, sign-in accounts, and GitHub Pages settings must be connected before activation.
+The Supabase public project configuration is supplied. Database readiness, sign-in accounts, and GitHub Pages activation still require verification.
 The existing app remains at https://platform-practice-lab-mwcv1o.v2.appdeploy.ai/ during preparation.
 
 Read [the complete setup and verification guide](docs/free-hosting.md).

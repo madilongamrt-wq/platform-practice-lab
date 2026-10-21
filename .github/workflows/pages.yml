@@ -14,7 +14,6 @@ concurrency:
 
 jobs:
   build:
-    if: vars.PAGES_ENABLED == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -25,13 +24,8 @@ jobs:
         with:
           node-version: '24'
           package-manager-cache: false
-      - name: Require public Supabase configuration
-        env:
-          SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          SUPABASE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: |
-          test -n "$SUPABASE_URL" || { echo 'Set VITE_SUPABASE_URL repository variable'; exit 1; }
-          test -n "$SUPABASE_KEY" || { echo 'Set VITE_SUPABASE_PUBLISHABLE_KEY repository variable'; exit 1; }
+      - name: Verify live database setup
+        run: python3 tools/check-supabase.py
       - run: npm install --package-lock=false
       - name: Run regression tests
         run: |
@@ -40,8 +34,6 @@ jobs:
       - name: Build site
         env:
           VITE_BASE_PATH: /platform-practice-lab/
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: |
           npm run build
           node tools/test-pages-build.cjs

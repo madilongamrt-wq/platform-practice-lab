@@ -1,6 +1,6 @@
 # Free hosting migration
 
-Status: prepared migration. No Supabase project has been connected and GitHub Pages has not been enabled by this change.
+Status: public Supabase project configuration is supplied in config/public.json. Database readiness and GitHub Pages activation are verified separately.
 
 ## Target
 
@@ -34,23 +34,21 @@ For public self-service registration or password recovery, configure a verified 
 Supabase's built-in email service is restricted and is not a public production mail service.
 Accounts and passwords from AppDeploy do not transfer automatically.
 
-## 3. Configure public client settings
+## 3. Public client settings
 
-In GitHub Settings > Secrets and variables > Actions > Variables, set:
-
-- `VITE_SUPABASE_URL`: the HTTPS project URL.
-- `VITE_SUPABASE_PUBLISHABLE_KEY`: the `sb_publishable_...` key.
-- `PAGES_ENABLED`: `true`, only after the schema and account are ready.
-
-The publishable key is meant for browsers. Never use a service-role key, `sb_secret_...` key, database password, or personal access token in a VITE_ variable.
-The client refuses to initialize without an HTTPS URL and an sb_publishable_ key.
+The owner supplied the project URL and publishable key in config/public.json.
+These settings are designed for browser use. They grant no authenticated user identity.
+The frontend supports VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY overrides for local development.
+Never place privileged keys, database passwords, or account passwords in that file.
 
 ## 4. Enable GitHub Pages
 
 In repository Settings > Pages, choose GitHub Actions as the source.
-Merge the migration after CI passes, then run Deploy GitHub Pages from Actions or push a commit to main.
-The workflow requires the two public settings and PAGES_ENABLED=true. It cannot deploy unconfigured sign-in.
-The available GitHub connector cannot change repository Pages settings or Actions variables, so those settings require the account owner.
+The available GitHub connector cannot change this administrative setting.
+Once CI passes and the migration merges, Deploy GitHub Pages automatically builds and deploys on main pushes.
+The deployment first runs tools/check-supabase.py. It refuses to proceed if the project key is invalid, the schema is missing, or anonymous progress access is allowed.
+If Pages is not enabled, enable it and rerun the failed deployment from Actions.
+No extra repository variables are needed for the supplied public configuration.
 
 ## 5. Verify before switching users
 
