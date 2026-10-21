@@ -32,7 +32,12 @@ print("PASS: Supabase accepts the public project configuration.")
 
 for path, body in [
     ("/rest/v1/lab_progress?select=exercise_id&limit=0", None),
-    ("/rest/v1/rpc/save_lab_progress", b"{}"),
+    ("/rest/v1/rpc/save_lab_progress", json.dumps({
+        "p_exercise_id": "crashloop",
+        "p_revision": 0,
+        "p_request_id": "00000000-0000-4000-8000-000000000001",
+        "p_data": {"id": "crashloop", "revision": 1}
+    }).encode()),
 ]:
     status, payload = request(path, body)
     try:
