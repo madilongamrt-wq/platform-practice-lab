@@ -4,7 +4,7 @@ import App from './App';
 import './index.css';
 import { registerServiceWorker } from './pwa';
 
-registerServiceWorker();
+registerServiceWorker(import.meta.env.BASE_URL);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,12 +1,13 @@
 
-const CACHE = 'platform-lab-public-v1';
+const BASE = new URL(self.registration.scope).pathname;
+const CACHE = 'platform-lab-public-v2-' + BASE;
 const PUBLIC_PATHS = [
-  '/offline.html',
-  '/manifest.json',
-  '/resources/lab-icon-180.png',
-  '/resources/lab-icon-192.png',
-  '/resources/lab-icon-512.png'
-];
+  'offline.html',
+  'manifest.json',
+  'resources/lab-icon-180.png',
+  'resources/lab-icon-192.png',
+  'resources/lab-icon-512.png'
+].map(path => BASE + path);
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PUBLIC_PATHS)));
@@ -32,7 +33,7 @@ self.addEventListener('fetch', event => {
 
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).catch(async () => {
-      const offline = await caches.match('/offline.html');
+      const offline = await caches.match(BASE + 'offline.html');
       return offline || new Response('You are offline. Reconnect to open Platform Practice Lab.', {
         status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' }
       });

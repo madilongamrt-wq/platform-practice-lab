@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { auth, api } from '@appdeploy/client';
+import { auth, api, backendConfigured } from './client';
 import {
   ArrowUpRight,
   Terminal,
@@ -51,6 +51,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [progress, setProgress] = useState<Progress[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [topic, setTopic] = useState('All exercises');
@@ -78,24 +80,26 @@ export default function App() {
       }
     })();
   }, []);
+  useEffect(() => auth.onSignedOut(() => {
+    setUser(null);
+    setProgress([]);
+    setSelected(null);
+    setCommand('');
+    setPassword('');
+  }), []);
+
   const signIn = async () => {
     setProblem('');
+    setBusy(true);
     try {
-      const signed = await auth.signIn();
+      const signed = await auth.signIn(email.trim(), password);
       setUser(signed.user);
-      setLoading(true);
+      setPassword('');
       await load();
-    } catch (err) {
-      const code = (err as { code?: string }).code;
-      setProblem(
-        code === 'popup_blocked'
-          ? 'Allow popups for this site, then try sign-in again.'
-          : code === 'popup_closed'
-            ? 'Sign-in was cancelled. Select Sign in to try again.'
-            : 'Sign-in or progress loading failed. Please retry.'
-      );
+    } catch {
+      setProblem('Sign-in or progress loading failed. Check your account details and try again.');
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   };
   const signOut = async () => {
@@ -233,9 +237,19 @@ export default function App() {
               <Layers size={17} /> 10 scenarios
             </span>
           </div>
-          <button className="primary" onClick={signIn}>
-            Sign in to your lab <ArrowUpRight size={18} />
-          </button>
+          {!backendConfigured && <p role="status">Lab setup is in progress. Sign-in will be enabled after the hosting setup finishes.</p>}
+          <form className="lab-login-form" onSubmit={event => { event.preventDefault(); void signIn(); }}>
+            <label htmlFor="lab-email">Email</label>
+            <input id="lab-email" type="email" autoComplete="username" required
+              value={email} onChange={event => setEmail(event.target.value)} />
+            <label htmlFor="lab-password">Password</label>
+            <input id="lab-password" type="password" autoComplete="current-password" required
+              value={password} onChange={event => setPassword(event.target.value)} />
+            <button className="primary" disabled={busy || !backendConfigured} type="submit">
+              {busy ? 'Signing in…' : 'Sign in to your lab'} <ArrowUpRight size={18} />
+            </button>
+            <small>Use your lab account. Contact the lab owner if you need access.</small>
+          </form>
           {errorBox}
           <small>
             Commands never run against a real shell or cluster. All
