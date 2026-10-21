@@ -71,3 +71,14 @@ do $$ begin
 end $$;
 reset role;
 select 'PASS: owner isolation, anonymous denial, idempotency, conflict and reset' as result;
+
+-- Reapplying setup with existing rows must preserve every stored value.
+create temporary table before_reapply as select * from public.lab_progress;
+\ir ../supabase/migrations/20261021_lab_progress.sql
+\ir ../supabase/migrations/20261021_lab_progress.sql
+do $$ begin
+  if exists ((select * from before_reapply except select * from public.lab_progress)
+    union all (select * from public.lab_progress except select * from before_reapply))
+  then raise exception 'Reapplying setup changed saved progress'; end if;
+end $$;
+select 'PASS: repeat setup preserves existing records' as repeat_result;
